@@ -1,0 +1,29 @@
+{% extends 'gallery/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card-custom">
+            <h2><i class="fas fa-arrows-alt"></i> Суретті жылжыту</h2>
+            <div class="text-center mb-3">
+                <img src="{{ photo.image.url }}" style="max-width:100%; max-height:300px; border-radius:10px;">
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Альбом таңдаңыз:</label>
+                    <select name="album" class="form-control-custom" style="width:100%;">
+                        <option value="">Альбомсыз</option>
+                        {% for album in albums %}
+                            <option value="{{ album.id }}" {% if photo.album and photo.album.id == album.id %}selected{% endif %}>
+                                {{ album.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary-custom">Жылжыту</button>
+                <a href="{% url 'gallery' %}" class="btn btn-secondary" style="background: var(--input); border: 1px solid var(--border); color: var(--text); width:100%;">Бас тарту</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

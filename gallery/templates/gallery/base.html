@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyCloud</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== НЕГІЗГІ АЙНЫМАЛЫЛАР ===== */
+        :root {
+            --bg: #f5f5f5;
+            --bg2: #ffffff;
+            --text: #1a1a1a;
+            --text2: #555;
+            --border: #e0e0e0;
+            --shadow: rgba(0,0,0,0.08);
+            --card: #ffffff;
+            --nav-bg: #1a1a1a;
+            --nav-text: #ffffff;
+            --input: #f0f0f0;
+        }
+        body.dark {
+            --bg: #0d0d0d;
+            --bg2: #1a1a1a;
+            --text: #f0f0f0;
+            --text2: #aaa;
+            --border: #2a2a2a;
+            --shadow: rgba(0,0,0,0.3);
+            --card: #1a1a1a;
+            --nav-bg: #000000;
+            --nav-text: #f0f0f0;
+            --input: #2a2a2a;
+        }
+
+        /* ===== ЖАЛПЫ СТИЛЬ ===== */
+        body {
+            background: var(--bg);
+            color: var(--text);
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ===== НАВИГАЦИЯ ===== */
+        .navbar-custom {
+            background: var(--nav-bg) !important;
+            border-bottom: 1px solid var(--border);
+            padding: 15px 0;
+        }
+        .navbar-custom .navbar-brand {
+            color: var(--nav-text) !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .navbar-custom .navbar-brand i {
+            margin-right: 10px;
+        }
+        .navbar-custom .nav-link {
+            color: var(--nav-text) !important;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .navbar-custom .nav-link:hover {
+            opacity: 0.7;
+        }
+
+        /* ===== КАРТОЧКА ===== */
+        .card-custom {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 30px var(--shadow);
+            transition: all 0.3s;
+        }
+        .photo-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        .photo-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px var(--shadow);
+        }
+        .photo-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+        .photo-card .card-body {
+            padding: 16px;
+        }
+        .photo-card .card-body small {
+            color: var(--text2);
+        }
+
+        /* ===== ФОРМА ===== */
+        .form-control-custom {
+            background: var(--input) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+            border-radius: 12px !important;
+            padding: 12px 16px !important;
+            transition: 0.3s;
+        }
+        .form-control-custom:focus {
+            border-color: #0ea5e9 !important;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2) !important;
+        }
+        .form-label {
+            color: var(--text2);
+            font-weight: 500;
+        }
+
+        /* ===== БАТЫРМАЛАР ===== */
+        .btn-primary-custom {
+            background: #0ea5e9;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: #fff;
+            transition: 0.3s;
+            width: 100%;
+        }
+        .btn-primary-custom:hover {
+            background: #0284c7;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-success-custom {
+            background: #14b8a6;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: #fff;
+            transition: 0.3s;
+        }
+        .btn-success-custom:hover {
+            background: #0d9488;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(20, 184, 166, 0.4);
+        }
+
+        .btn-danger-custom {
+            background: #f43f5e;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 10px;
+            font-weight: 500;
+            color: #fff;
+            transition: 0.3s;
+        }
+        .btn-danger-custom:hover {
+            background: #e11d48;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(244, 63, 94, 0.4);
+        }
+
+        /* ===== ТЕМА АУЫСТЫРҒЫШ ===== */
+        .theme-toggle {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 20px;
+            color: var(--text);
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        /* ===== ХАБАРЛАМА ===== */
+        .alert-custom {
+            border-radius: 14px;
+            padding: 16px 20px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+        }
+
+        /* ===== БОС БЕТ ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .empty-state i {
+            font-size: 70px;
+            color: var(--text2);
+            opacity: 0.3;
+        }
+        .empty-state h3 {
+            margin-top: 20px;
+            color: var(--text);
+        }
+        .empty-state p {
+            color: var(--text2);
+        }
+
+        /* =============================================== */
+        /* ===== МОБИЛЬДІ АДАПТАЦИЯ ===== */
+        /* =============================================== */
+
+        /* Кішкентай телефондар (≤ 576px) */
+        @media (max-width: 576px) {
+            .container {
+                padding-left: 8px !important;
+                padding-right: 8px !important;
+            }
+            .card-custom {
+                padding: 14px !important;
+                border-radius: 12px !important;
+            }
+            .col-md-3 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            .photo-card img {
+                height: 220px !important;
+            }
+
+            /* Батырмалар үлкен әрі басуға ыңғайлы */
+            .btn-primary-custom,
+            .btn-success-custom {
+                width: 100% !important;
+                padding: 16px !important;
+                font-size: 18px !important;
+                border-radius: 14px !important;
+            }
+            .photo-card .card-body .btn-sm {
+                width: 100% !important;
+                padding: 14px !important;
+                font-size: 16px !important;
+            }
+
+            /* Альбомдар тізімі */
+            .mt-3.d-flex.flex-wrap {
+                gap: 6px !important;
+            }
+            .mt-3.d-flex.flex-wrap .btn-sm {
+                font-size: 12px !important;
+                padding: 8px 14px !important;
+            }
+
+            /* Тақырып */
+            h2 {
+                font-size: 20px !important;
+            }
+            h2 i {
+                font-size: 18px !important;
+            }
+
+            /* Навигация */
+            .navbar-brand {
+                font-size: 1.3rem !important;
+            }
+            .nav-link {
+                font-size: 16px !important;
+                padding: 10px 14px !important;
+            }
+            .theme-toggle {
+                width: 44px !important;
+                height: 44px !important;
+                font-size: 20px !important;
+            }
+
+            /* Модальдық терезе */
+            .modal-dialog {
+                margin: 10px !important;
+            }
+            .modal-content {
+                border-radius: 16px !important;
+            }
+            #modalImage {
+                max-height: 55vh !important;
+            }
+            .modal-footer {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .modal-footer .btn {
+                width: 100% !important;
+            }
+
+            /* Бос бет */
+            .empty-state {
+                padding: 40px 15px !important;
+            }
+            .empty-state i {
+                font-size: 50px !important;
+            }
+            .empty-state h3 {
+                font-size: 18px !important;
+            }
+        }
+
+        /* Планшет және орташа экрандар (≤ 768px) */
+        @media (max-width: 768px) {
+            .col-md-3 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+            .photo-card img {
+                height: 180px !important;
+            }
+        }
+
+        /* Үлкен экрандар (≥ 992px) - ештеңе өзгермейді */
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== НАВИГАЦИЯ ===== -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'gallery' %}">
+                <i class="fas fa-cloud"></i> MyCloud
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center gap-2">
+
+                    
+                   <!-- ТІЛ АУЫСТЫРҒЫШ -->
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown">
+        <i class="fas fa-globe"></i> 
+        {% if request.LANGUAGE_CODE == 'kk' %}🇰🇿 Қазақша
+        {% elif request.LANGUAGE_CODE == 'ru' %}🇷🇺 Русский
+        {% else %}🇬🇧 English{% endif %}
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item" href="{% url 'set_language' 'kk' %}">🇰🇿 Қазақша</a></li>
+        <li><a class="dropdown-item" href="{% url 'set_language' 'ru' %}">🇷🇺 Русский</a></li>
+        <li><a class="dropdown-item" href="{% url 'set_language' 'en' %}">🇬🇧 English</a></li>
+    </ul>
+</li>
+
+                    <!-- ТЕМА АУЫСТЫРҒЫШ -->
+                    <li class="nav-item">
+                        <button class="theme-toggle" id="themeToggle" title="Теманы ауыстыру">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+
+                    <!-- ПАЙДАЛАНУШЫҒА БАЙЛАНЫСТЫ СІЛТЕМЕЛЕР -->
+                    {% if user.is_authenticated %}
+                        <li><a class="nav-link" href="{% url 'upload' %}"><i class="fas fa-upload"></i> 
+                            {% if request.session.django_language == 'kk' %}Жүктеу
+                            {% elif request.session.django_language == 'ru' %}Загрузить
+                            {% else %}Upload{% endif %}
+                        </a></li>
+                        <li><a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> 
+                            {% if request.session.django_language == 'kk' %}Шығу
+                            {% elif request.session.django_language == 'ru' %}Выйти
+                            {% else %}Logout{% endif %}
+                        </a></li>
+                    {% else %}
+                        <li><a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> 
+                            {% if request.session.django_language == 'kk' %}Кіру
+                            {% elif request.session.django_language == 'ru' %}Войти
+                            {% else %}Login{% endif %}
+                        </a></li>
+                        <li><a class="nav-link" href="{% url 'register' %}"><i class="fas fa-user-plus"></i> 
+                            {% if request.session.django_language == 'kk' %}Тіркелу
+                            {% elif request.session.django_language == 'ru' %}Регистрация
+                            {% else %}Register{% endif %}
+                        </a></li>
+                    {% endif %}
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== ХАБАРЛАМАЛАР ===== -->
+    <div class="container mt-4">
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="alert alert-custom">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- ===== НЕГІЗГІ МАЗМҰН ===== -->
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- ================================================== -->
+    <!-- ===== JAVASCRIPT (ТЕМА + САУСАҚПЕН СИПАУ) ===== -->
+    <!-- ================================================== -->
+
+    <script>
+        // ===== ТЕМА АУЫСТЫРУ =====
+        const toggleBtn = document.getElementById('themeToggle');
+        const body = document.body;
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            toggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        toggleBtn.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            const isDark = body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            toggleBtn.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        // ===== САУСАҚПЕН СИПАУ (TOUCH SWIPE) =====
+        // Бұл код суретті үлкейтіп көргенде жұмыс істейді
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            const modal = document.getElementById('imageModal');
+            if (modal && modal.classList.contains('show')) {
+                touchStartX = e.changedTouches[0].screenX;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', function(e) {
+            const modal = document.getElementById('imageModal');
+            if (modal && modal.classList.contains('show')) {
+                touchEndX = e.changedTouches[0].screenX;
+                const diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) {
+                        // Оңға сипау → келесі сурет
+                        if (typeof nextPhoto === 'function') nextPhoto();
+                    } else {
+                        // Солға сипау → алдыңғы сурет
+                        if (typeof prevPhoto === 'function') prevPhoto();
+                    }
+                }
+            }
+        }, { passive: true });
+    </script>
+
+    <!-- BOOTSTRAP JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

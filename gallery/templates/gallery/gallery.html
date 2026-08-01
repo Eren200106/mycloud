@@ -1,0 +1,291 @@
+{% extends 'gallery/base.html' %}
+{% block content %}
+{% load gallery_filters %}
+
+<div class="card-custom" style="padding: 0; border: none; background: transparent; box-shadow: none;">
+    <div class="d-flex justify-content-between align-items-center flex-wrap" style="padding: 16px 16px 0 16px;">
+        <h2><i class="fas fa-images"></i> 
+            {% if request.session.django_language == 'kk' %}Менің галереям
+            {% elif request.session.django_language == 'ru' %}Моя галерея
+            {% else %}My gallery{% endif %}
+        </h2>
+        <a href="{% url 'upload' %}" class="btn btn-success-custom" style="width:auto; padding: 8px 16px; font-size: 14px;">
+            <i class="fas fa-plus"></i> 
+            {% if request.session.django_language == 'kk' %}Сурет қосу
+            {% elif request.session.django_language == 'ru' %}Добавить фото
+            {% else %}Add photo{% endif %}
+        </a>
+    </div>
+
+    <!-- БАСҚАРУ ПАНЕЛІ -->
+    <div class="mt-2 p-2" style="background: var(--input); border-radius: 12px; border: 1px solid var(--border); margin: 0 8px 12px 8px;">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <button class="btn btn-secondary btn-sm" onclick="selectAll()" style="background: var(--bg2); border: 1px solid var(--border); color: var(--text); font-size: 12px; padding: 4px 10px;">
+                <i class="fas fa-check-double"></i> 
+                {% if request.session.django_language == 'kk' %}Барлығы
+                {% elif request.session.django_language == 'ru' %}Все
+                {% else %}All{% endif %}
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="deselectAll()" style="background: var(--bg2); border: 1px solid var(--border); color: var(--text); font-size: 12px; padding: 4px 10px;">
+                <i class="fas fa-times"></i> 
+                {% if request.session.django_language == 'kk' %}Таңдаудан шығару
+                {% elif request.session.django_language == 'ru' %}Снять
+                {% else %}Deselect{% endif %}
+            </button>
+            <span class="text-muted" style="font-size: 12px;">
+                <span id="selectedCount">0</span> 
+                {% if request.session.django_language == 'kk' %}таңд.
+                {% elif request.session.django_language == 'ru' %}выбр.
+                {% else %}sel.{% endif %}
+            </span>
+            <div class="ms-auto d-flex gap-2">
+                <button onclick="downloadSelected()" class="btn btn-primary-custom btn-sm" style="width:auto; padding: 4px 12px; font-size: 12px;">
+                    <i class="fas fa-download"></i>
+                </button>
+                <form id="bulkDeleteForm" method="post" action="{% url 'bulk_delete' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="photo_ids" id="deletePhotoIds">
+                    <button type="submit" class="btn btn-danger-custom btn-sm" style="width:auto; padding: 4px 12px; font-size: 12px;" onclick="return confirm('Жойғыңыз келе ме?')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- СУРЕТТЕРДІ ДАТА БОЙЫНША ТОПТАСТЫРУ -->
+    <!-- ============================================ -->
+    {% for date_key in sorted_dates %}
+        <div class="photo-group">
+            <!-- ДАТА (топ басы) -->
+            <div style="padding: 12px 16px 8px 16px; font-size: 14px; font-weight: 600; color: var(--text2);">
+                {{ date_key|date:"d.m.Y" }}
+            </div>
+            
+            <!-- Осы күнге арналған суреттер -->
+            <div class="row g-0">
+                {% for photo in grouped_photos|get_item:date_key %}
+                    <div class="col-4 col-md-3">
+                        <div class="photo-card" style="border-radius: 0; border: none; background: transparent; box-shadow: none; margin: 1px; position: relative;">
+                            <div class="position-relative" style="padding-bottom: 100%; height: 0; overflow: hidden; background: var(--bg2);">
+                                <img src="{{ photo.image.url }}" alt="Сурет" 
+                                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; cursor:pointer;" 
+                                     onclick="openModal({{ forloop.parentloop.counter0 }}, {{ forloop.counter0 }})">
+                                <!-- ЧЕКБОКС -->
+                                <div class="position-absolute top-0 start-0 m-1" style="z-index: 5;">
+                                    <input type="checkbox" class="photo-checkbox form-check-input" value="{{ photo.id }}" 
+                                           style="width: 18px; height: 18px; cursor: pointer; accent-color: #0ea5e9;" 
+                                           onchange="updateSelectedCount()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-state" style="padding: 60px 20px; text-align: center; width: 100%;">
+            <i class="fas fa-cloud-upload-alt" style="font-size: 50px; color: var(--text2); opacity: 0.3;"></i>
+            <h3 style="margin-top: 20px; color: var(--text);">
+                {% if request.session.django_language == 'kk' %}Әлі сурет жоқ
+                {% elif request.session.django_language == 'ru' %}Фотографий пока нет
+                {% else %}No photos yet{% endif %}
+            </h3>
+            <p style="color: var(--text2);">
+                {% if request.session.django_language == 'kk' %}Бірінші суретіңізді жүктеңіз!
+                {% elif request.session.django_language == 'ru' %}Загрузите первое фото!
+                {% else %}Upload your first photo!{% endif %}
+            </p>
+            <a href="{% url 'upload' %}" class="btn btn-primary-custom" style="width:auto;">
+                {% if request.session.django_language == 'kk' %}Сурет жүктеу
+                {% elif request.session.django_language == 'ru' %}Загрузить фото
+                {% else %}Upload photo{% endif %}
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- ===== МОДАЛЬДЫҚ ТЕРЕЗЕ ===== -->
+<div class="modal fade" id="imageModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content" style="background: var(--bg2); border: none; border-radius: 0;">
+            <div class="modal-header border-0" style="position: absolute; top: 0; left: 0; right: 0; z-index: 10; padding: 16px 20px; background: transparent; border: none;">
+                <h5 class="modal-title" style="color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+                    <span id="photoCounter" style="background: rgba(0,0,0,0.5); padding: 6px 16px; border-radius: 20px; font-size: 14px;">1 / 1</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 50%;"></button>
+            </div>
+            <div class="modal-body p-0 m-0 d-flex align-items-center justify-content-center position-relative" style="background: var(--bg2); min-height: 100vh;">
+                <button class="btn btn-light position-absolute top-50 start-0 translate-middle-y" id="prevBtn" style="z-index:10; border-radius:50%; width:56px; height:56px; font-size:28px; display:none; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.3); color: #fff; backdrop-filter: blur(8px); margin-left: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);" onclick="prevPhoto()">‹</button>
+                <img id="modalImage" src="" alt="Сурет" style="max-width:100%; max-height:100vh; width:auto; height:auto; object-fit:contain; border-radius:0; display:block;">
+                <button class="btn btn-light position-absolute top-50 end-0 translate-middle-y" id="nextBtn" style="z-index:10; border-radius:50%; width:56px; height:56px; font-size:28px; display:none; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.3); color: #fff; backdrop-filter: blur(8px); margin-right: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);" onclick="nextPhoto()">›</button>
+            </div>
+            <div class="modal-footer border-0 justify-content-center" style="position: absolute; bottom: 20px; left: 0; right: 0; z-index: 10; background: transparent; border: none; gap: 16px;">
+                <a id="downloadModalBtn" href="#" download class="btn btn-light" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 30px; padding: 12px 30px; font-weight: 500; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                    <i class="fas fa-download"></i> 
+                    {% if request.session.django_language == 'kk' %}Жүктеу
+                    {% elif request.session.django_language == 'ru' %}Скачать
+                    {% else %}Download{% endif %}
+                </a>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 30px; padding: 12px 30px; font-weight: 500; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                    <i class="fas fa-times"></i> 
+                    {% if request.session.django_language == 'kk' %}Жабу
+                    {% elif request.session.django_language == 'ru' %}Закрыть
+                    {% else %}Close{% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== БАРЛЫҚ СУРЕТТЕРДІҢ URL-ДЕРІ =====
+    const photoUrls = [
+        {% for date_key in sorted_dates %}
+            {% for photo in grouped_photos|get_item:date_key %}
+                "{{ photo.image.url }}"{% if not forloop.last %},{% endif %}
+            {% endfor %}
+            {% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    let currentIndex = 0;
+
+    function openModal(dateIndex, photoIndex) {
+        // Барлық суреттер тізіміндегі индексін есептеу
+        let index = 0;
+        {% for date_key in sorted_dates %}
+            if ({{ forloop.counter0 }} < dateIndex) {
+                index += {{ grouped_photos|get_item:date_key|length }};
+            }
+        {% endfor %}
+        index += photoIndex;
+        currentIndex = index;
+        updateModalImage();
+        const modal = new bootstrap.Modal(document.getElementById('imageModal'), { backdrop: true, keyboard: true, focus: true });
+        modal.show();
+    }
+
+    function updateModalImage() {
+        const img = document.getElementById('modalImage');
+        const counter = document.getElementById('photoCounter');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const downloadBtn = document.getElementById('downloadModalBtn');
+        
+        img.src = photoUrls[currentIndex];
+        downloadBtn.href = photoUrls[currentIndex];
+        counter.textContent = `${currentIndex + 1} / ${photoUrls.length}`;
+        
+        prevBtn.style.display = currentIndex > 0 ? 'flex' : 'none';
+        nextBtn.style.display = currentIndex < photoUrls.length - 1 ? 'flex' : 'none';
+    }
+
+    function prevPhoto() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateModalImage();
+        }
+    }
+
+    function nextPhoto() {
+        if (currentIndex < photoUrls.length - 1) {
+            currentIndex++;
+            updateModalImage();
+        }
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (document.getElementById('imageModal').classList.contains('show')) {
+            if (event.key === 'ArrowLeft') { event.preventDefault(); prevPhoto(); }
+            else if (event.key === 'ArrowRight') { event.preventDefault(); nextPhoto(); }
+            else if (event.key === 'Escape') {
+                bootstrap.Modal.getInstance(document.getElementById('imageModal')).hide();
+            }
+        }
+    });
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener('touchstart', function(e) {
+        const modal = document.getElementById('imageModal');
+        if (modal && modal.classList.contains('show')) {
+            touchStartX = e.changedTouches[0].screenX;
+        }
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+        const modal = document.getElementById('imageModal');
+        if (modal && modal.classList.contains('show')) {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    nextPhoto();
+                } else {
+                    prevPhoto();
+                }
+            }
+        }
+    }, { passive: true });
+
+    // ======================================================
+    // ===== MASS SELECTION / BULK ACTIONS =====
+    // ======================================================
+
+    function updateSelectedCount() {
+        const checked = document.querySelectorAll('.photo-checkbox:checked');
+        document.getElementById('selectedCount').textContent = checked.length;
+    }
+
+    function selectAll() {
+        document.querySelectorAll('.photo-checkbox').forEach(cb => cb.checked = true);
+        updateSelectedCount();
+    }
+
+    function deselectAll() {
+        document.querySelectorAll('.photo-checkbox').forEach(cb => cb.checked = false);
+        updateSelectedCount();
+    }
+
+    function downloadSelected() {
+        const checkboxes = document.querySelectorAll('.photo-checkbox:checked');
+        if (checkboxes.length === 0) {
+            alert('Ешқандай сурет таңдалмады!');
+            return;
+        }
+        let delay = 0;
+        checkboxes.forEach((cb) => {
+            const card = cb.closest('.photo-card');
+            const img = card.querySelector('img');
+            const url = img.src;
+            setTimeout(() => {
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = url.split('/').pop() || 'photo.jpg';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }, delay);
+            delay += 400;
+        });
+    }
+
+    document.getElementById('bulkDeleteForm').addEventListener('submit', function(e) {
+        const checked = document.querySelectorAll('.photo-checkbox:checked');
+        const ids = Array.from(checked).map(cb => cb.value);
+        if (ids.length === 0) {
+            e.preventDefault();
+            alert('Ешқандай сурет таңдалмады!');
+            return false;
+        }
+        document.getElementById('deletePhotoIds').value = ids.join(',');
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateSelectedCount();
+    });
+</script>
+{% endblock %}

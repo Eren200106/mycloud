@@ -1,0 +1,18 @@
+{% extends 'gallery/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card-custom">
+            <h2><i class="fas fa-sign-in-alt"></i> Кіру</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary-custom">Кіру</button>
+            </form>
+            <div class="mt-3 text-center">
+                <small>Аккаунтыңыз жоқ па? <a href="{% url 'register' %}" style="color:#6c63ff;">Тіркелу</a></small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'gallery/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card-custom">
+            <h2><i class="fas fa-folder-plus"></i> Жаңа альбом</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary-custom">Құру</button>
+                <a href="{% url 'gallery' %}" class="btn btn-secondary" style="background: var(--input); border: 1px solid var(--border); color: var(--text); width:100%;">Бас тарту</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

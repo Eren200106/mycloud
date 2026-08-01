@@ -1,0 +1,47 @@
+{% extends 'gallery/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card-custom">
+            <h2><i class="fas fa-folder-plus"></i> 
+                {% if request.session.django_language == 'kk' %}Суретті альбомға қосу
+                {% elif request.session.django_language == 'ru' %}Добавить фото в альбом
+                {% else %}Add photo to album{% endif %}
+            </h2>
+            <div class="text-center mb-3">
+                <img src="{{ photo.image.url }}" style="max-width:100%; max-height:300px; border-radius:10px;">
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">
+                        {% if request.session.django_language == 'kk' %}Альбом таңдаңыз
+                        {% elif request.session.django_language == 'ru' %}Выберите альбом
+                        {% else %}Select album{% endif %}
+                    </label>
+                    <select name="album" class="form-control-custom">
+                        <option value="">{% if request.session.django_language == 'kk' %}Альбомсыз{% elif request.session.django_language == 'ru' %}Без альбома{% else %}Without album{% endif %}</option>
+                        {% for album in albums %}
+                            <option value="{{ album.id }}" {% if photo.album and photo.album.id == album.id %}selected{% endif %}>
+                                {{ album.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary-custom">
+                    <i class="fas fa-save"></i> 
+                    {% if request.session.django_language == 'kk' %}Сақтау
+                    {% elif request.session.django_language == 'ru' %}Сохранить
+                    {% else %}Save{% endif %}
+                </button>
+                <a href="{% url 'gallery' %}" class="btn btn-secondary" style="width:100%; background: var(--input); border: 1px solid var(--border); color: var(--text); margin-top:10px;">
+                    <i class="fas fa-arrow-left"></i> 
+                    {% if request.session.django_language == 'kk' %}Галереяға оралу
+                    {% elif request.session.django_language == 'ru' %}Вернуться в галерею
+                    {% else %}Back to gallery{% endif %}
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

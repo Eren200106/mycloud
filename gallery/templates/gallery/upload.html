@@ -1,0 +1,44 @@
+{% extends 'gallery/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card-custom">
+            <h2><i class="fas fa-cloud-upload-alt"></i> 
+                {% if request.session.django_language == 'kk' %}Сурет жүктеу
+                {% elif request.session.django_language == 'ru' %}Загрузить фото
+                {% else %}Upload photos{% endif %}
+            </h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">
+                        {% if request.session.django_language == 'kk' %}Суреттерді таңдаңыз (бірнеше)
+                        {% elif request.session.django_language == 'ru' %}Выберите фото (несколько)
+                        {% else %}Select photos (multiple){% endif %}
+                    </label>
+                    <input type="file" name="images" multiple accept="image/*" class="form-control-custom">
+                    <small class="text-muted">
+                        {% if request.session.django_language == 'kk' %}Бірнеше суретті Ctrl+басу арқылы таңдаңыз
+                        {% elif request.session.django_language == 'ru' %}Выберите несколько фото, зажав Ctrl
+                        {% else %}Select multiple photos by holding Ctrl{% endif %}
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-success-custom">
+                    <i class="fas fa-upload"></i> 
+                    {% if request.session.django_language == 'kk' %}Барлығын жүктеу
+                    {% elif request.session.django_language == 'ru' %}Загрузить все
+                    {% else %}Upload all{% endif %}
+                </button>
+            </form>
+            <div class="mt-3">
+                <a href="{% url 'gallery' %}" class="btn btn-secondary" style="width:100%; background: var(--input); border: 1px solid var(--border); color: var(--text);">
+                    <i class="fas fa-arrow-left"></i> 
+                    {% if request.session.django_language == 'kk' %}Галереяға оралу
+                    {% elif request.session.django_language == 'ru' %}Вернуться в галерею
+                    {% else %}Back to gallery{% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
