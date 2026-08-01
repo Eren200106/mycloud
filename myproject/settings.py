@@ -2,7 +2,9 @@
 Django settings for myproject project.
 """
 import os
-import dj_database_url
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,6 +22,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',           # ҚОСЫҢЫЗ
+    'cloudinary_storage',   # ҚОСЫҢЫЗ
     'gallery',
 ]
 
@@ -62,6 +66,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 # ===== ҚҰПИЯ СӨЗДІ ТЕКСЕРУ =====
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -86,8 +91,15 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# ===== CLOUDINARY =====
+cloudinary.config(
+    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME', 'СІЗДІҢ_CLOUD_NAME'),
+    api_key = os.environ.get('CLOUDINARY_API_KEY', 'СІЗДІҢ_API_KEY'),
+    api_secret = os.environ.get('CLOUDINARY_API_SECRET', 'СІЗДІҢ_API_SECRET'),
+    secure = True
+)
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # ===== КІРУ/ШЫҒУ =====
 LOGIN_URL = 'login'
