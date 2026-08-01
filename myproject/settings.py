@@ -1,14 +1,18 @@
 """
 Django settings for myproject project.
 """
+import os
+import dj_database_url
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-9pq5uc=y8ao-&dn2y1v^(^sr_6i8d$wo8qcqi@q1+_6w4r9s36'
-DEBUG = True
+# ===== ҚАУІПСІЗДІК =====
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-9pq5uc=y8ao-&dn2y1v^(^sr_6i8d$wo8qcqi@q1+_6w4r9s36')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
 
+# ===== ҚОСЫМШАЛАР =====
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -19,8 +23,10 @@ INSTALLED_APPS = [
     'gallery',
 ]
 
+# ===== MIDDLEWARE =====
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Static файлдар үшін
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,13 +55,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
+# ===== ДЕРЕКҚОР (PostgreSQL немесе SQLite) =====
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
+# ===== ҚҰПИЯ СӨЗДІ ТЕКСЕРУ =====
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -74,16 +83,19 @@ TIME_ZONE = 'Asia/Almaty'
 USE_I18N = True
 USE_TZ = True
 
+# ===== STATIC ЖӘНЕ MEDIA =====
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ===== МЕДИА ФАЙЛДАР (СУРЕТТЕР) =====
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'   # ТОЛЫҚ ЖОЛ
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # ===== КІРУ/ШЫҒУ =====
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'gallery'
 LOGOUT_REDIRECT_URL = 'login'
 
+# ===== ФАЙЛ ЖҮКТЕУ ШЕКТЕУЛЕРІ =====
 DATA_UPLOAD_MAX_NUMBER_FILES = 200
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
