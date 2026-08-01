@@ -26,7 +26,7 @@ INSTALLED_APPS = [
 # ===== MIDDLEWARE =====
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Static файлдар үшін
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,7 +55,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
-# ===== ДЕРЕКҚОР (PostgreSQL немесе SQLite) =====
+# ===== ДЕРЕКҚОР =====
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///db.sqlite3',
